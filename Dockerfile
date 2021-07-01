@@ -1,14 +1,17 @@
 FROM mhart/alpine-node:10.20.1
 
-WORKDIR /usr/src/cognito-local
+RUN mkdir -p /cognito-local
+WORKDIR /cognito-local
 
-COPY . ./
+# Install app dependencies
+COPY [ "package.json", "babel.config.js", "tsconfig.json", "tsconfig.build.json",  "/cognito-local/" ]
 
-RUN mkdir .cognito && npm i
+RUN npm i
 
-ENV PATH /usr/src/cognito-local/node_modules/.bin:${PATH}
+RUN mkdir -p /src
 
-VOLUME /usr/src/cognito-local/.cognito
+VOLUME /cognito-local/.cognito
+VOLUME /cognito-local/src/
 
 ENV HOST=0.0.0.0
 EXPOSE 9229

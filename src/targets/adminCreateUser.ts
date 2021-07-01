@@ -27,7 +27,7 @@ export const AdminCreateUser = ({
     Password: TemporaryPassword,
     Attributes: UserAttributes,
     Enabled: true,
-    UserStatus: "CONFIRMED",
+    UserStatus: "FORCE_CHANGE_PASSWORD",
     ConfirmationCode: undefined,
     UserCreateDate: new Date().getTime(),
     UserLastModifiedDate: new Date().getTime(),
