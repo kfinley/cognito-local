@@ -1,5 +1,5 @@
 import {
-  InvalidPasswordError,
+  InvalidUsernameOrPasswordError,
   NotAuthorizedError,
   PasswordResetRequiredError,
   UnsupportedError,
@@ -36,7 +36,17 @@ export interface PasswordVerifierOutput {
   };
 }
 
-export type Output = SmsMfaOutput | PasswordVerifierOutput;
+export interface NewPasswordRequiredOutput {
+  ChallengeName: "NEW_PASSWORD_REQUIRED";
+  ChallengeParameters: {};
+  Session: string | null;
+  AuthenticationResult: {} | undefined;
+}
+
+export type Output =
+  | SmsMfaOutput
+  | PasswordVerifierOutput
+  | NewPasswordRequiredOutput;
 
 export type InitiateAuthTarget = (body: Input) => Promise<Output>;
 
@@ -98,6 +108,25 @@ const verifyPasswordChallenge = async (
   Session: body.Session,
 });
 
+function newPasswordChallenge(
+  user: User,
+  body: Input
+): NewPasswordRequiredOutput {
+  return {
+    ChallengeName: "NEW_PASSWORD_REQUIRED",
+    ChallengeParameters: {
+      USER_ID_FOR_SRP: user.Username,
+      requiredAttributes: "[]",
+      userAttributes: JSON.stringify({
+        email_verified: true,
+        email: user.Attributes.filter((a) => a.Name === "email")[0],
+      }),
+    },
+    AuthenticationResult: undefined,
+    Session: body.Session,
+  };
+}
+
 export const InitiateAuth = ({
   codeDelivery,
   cognitoClient,
@@ -125,14 +154,16 @@ export const InitiateAuth = ({
     });
   }
 
-  if (!user) {
-    throw new NotAuthorizedError();
+  if (!user || user.Password !== body.AuthParameters.PASSWORD) {
+    throw new InvalidUsernameOrPasswordError();
   }
+
+  if (user.UserStatus === "FORCE_CHANGE_PASSWORD") {
+    return newPasswordChallenge(user, body);
+  }
+
   if (user.UserStatus === "RESET_REQUIRED") {
     throw new PasswordResetRequiredError();
-  }
-  if (user.Password !== body.AuthParameters.PASSWORD) {
-    throw new InvalidPasswordError();
   }
 
   if (

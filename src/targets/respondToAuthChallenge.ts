@@ -1,12 +1,13 @@
-import { CodeMismatchError, NotAuthorizedError } from "../errors";
+import { CodeMismatchError, InvalidUsernameOrPasswordError } from "../errors";
 import { Services } from "../services";
 import { generateTokens } from "../services/tokens";
 
 interface Input {
-  ChallengeName: "SMS_MFA";
+  ChallengeName: "SMS_MFA" | "NEW_PASSWORD_REQUIRED";
   ChallengeResponses: {
     USERNAME: string;
-    SMS_MFA_CODE: string;
+    NEW_PASSWORD?: string | null;
+    SMS_MFA_CODE: string | null;
   };
   ClientId: string;
   Session: string | null;
@@ -33,11 +34,16 @@ export const RespondToAuthChallenge = ({
     body.ChallengeResponses.USERNAME
   );
   if (!user) {
-    throw new NotAuthorizedError();
+    throw new InvalidUsernameOrPasswordError();
   }
 
   if (user.MFACode !== body.ChallengeResponses.SMS_MFA_CODE) {
     throw new CodeMismatchError();
+  }
+
+  if (body.ChallengeName === "NEW_PASSWORD_REQUIRED") {
+    user.Password = body.ChallengeResponses.NEW_PASSWORD as string;
+    user.UserStatus = "CONFIRMED";
   }
 
   await userPool.saveUser({

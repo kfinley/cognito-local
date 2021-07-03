@@ -35,9 +35,9 @@ export class CodeMismatchError extends CognitoError {
   }
 }
 
-export class InvalidPasswordError extends CognitoError {
+export class InvalidUsernameOrPasswordError extends CognitoError {
   public constructor() {
-    super("InvalidPasswordException", "Invalid password");
+    super("InvalidPasswordException", "Incorrect username or password.");
   }
 }
 

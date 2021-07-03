@@ -2,7 +2,7 @@ import supertest from "supertest";
 import {
   CodeMismatchError,
   CognitoError,
-  InvalidPasswordError,
+  InvalidUsernameOrPasswordError,
   NotAuthorizedError,
   UnsupportedError,
   UsernameExistsError,
@@ -79,7 +79,7 @@ describe("HTTP server", () => {
         ${new NotAuthorizedError()}                    | ${"NotAuthorizedException"}   | ${"User not authorized"}
         ${new UsernameExistsError()}                   | ${"UsernameExistsException"}  | ${"User already exists"}
         ${new CodeMismatchError()}                     | ${"CodeMismatchException"}    | ${"Incorrect confirmation code"}
-        ${new InvalidPasswordError()}                  | ${"InvalidPasswordException"} | ${"Invalid password"}
+        ${new InvalidUsernameOrPasswordError()}        | ${"InvalidPasswordException"} | ${"Invalid password"}
       `(
         "it converts $code to the format Cognito SDK expects",
         async ({ error, code, message }) => {

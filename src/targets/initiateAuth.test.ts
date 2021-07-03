@@ -1,7 +1,7 @@
 import { advanceTo } from "jest-date-mock";
 import jwt from "jsonwebtoken";
 import {
-  InvalidPasswordError,
+  InvalidUsernameOrPasswordError,
   NotAuthorizedError,
   PasswordResetRequiredError,
 } from "../errors";
@@ -79,7 +79,7 @@ describe("InitiateAuth target", () => {
           },
           Session: "Session",
         })
-      ).rejects.toBeInstanceOf(InvalidPasswordError);
+      ).rejects.toBeInstanceOf(InvalidUsernameOrPasswordError);
     });
 
     it("throws when user requires reset", async () => {
