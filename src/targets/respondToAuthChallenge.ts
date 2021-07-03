@@ -59,6 +59,6 @@ export const RespondToAuthChallenge = ({
       body.ClientId,
       userPool.config.Id
     ),
-    Session: body.Session,
+    Session: null,
   };
 };

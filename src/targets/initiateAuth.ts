@@ -159,6 +159,7 @@ export const InitiateAuth = ({
   }
 
   if (user.UserStatus === "FORCE_CHANGE_PASSWORD") {
+    body.Session = "xxx --- FIX THIS --- xxx";
     return newPasswordChallenge(user, body);
   }
 
