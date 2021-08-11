@@ -28,6 +28,7 @@ export type RespondToAuthChallengeTarget = (body: Input) => Promise<Output>;
 
 export const RespondToAuthChallenge = ({
   cognitoClient,
+  triggers,
 }: Services): RespondToAuthChallengeTarget => async (body) => {
   const userPool = await cognitoClient.getUserPoolForClientId(body.ClientId);
   const user = await userPool.getUserByUsername(
@@ -51,6 +52,16 @@ export const RespondToAuthChallenge = ({
     MFACode: undefined,
   });
 
+  if (triggers.enabled("PostAuthentication")) {
+    await triggers.postAuthentication({
+      source: "PostAuthentication_Authentication",
+      username: user.Username,
+      clientId: body.ClientId,
+      userPoolId: userPool.config.Id,
+      userAttributes: user.Attributes,
+    });
+  }
+
   return {
     ChallengeName: body.ChallengeName,
     ChallengeParameters: {},
@@ -59,6 +70,6 @@ export const RespondToAuthChallenge = ({
       body.ClientId,
       userPool.config.Id
     ),
-    Session: null,
+    Session: body.Session ?? null,
   };
 };

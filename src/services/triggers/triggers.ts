@@ -1,12 +1,19 @@
-import { Services, CognitoClient } from "../index";
+import { CognitoClient } from "../index";
 import { Lambda } from "../lambda";
+import {
+  PostAuthentication,
+  PostAuthenticationTrigger,
+} from "./postAuthentication";
 import { PostConfirmation, PostConfirmationTrigger } from "./postConfirmation";
 import { UserMigration, UserMigrationTrigger } from "./userMigration";
 
 export interface Triggers {
-  enabled(trigger: "UserMigration" | "PostConfirmation"): boolean;
+  enabled(
+    trigger: "UserMigration" | "PostConfirmation" | "PostAuthentication"
+  ): boolean;
   userMigration: UserMigrationTrigger;
   postConfirmation: PostConfirmationTrigger;
+  postAuthentication: PostAuthenticationTrigger;
 }
 
 export const createTriggers = (services: {
@@ -16,4 +23,5 @@ export const createTriggers = (services: {
   enabled: (trigger: "UserMigration") => services.lambda.enabled(trigger),
   userMigration: UserMigration(services),
   postConfirmation: PostConfirmation(services),
+  postAuthentication: PostAuthentication(services),
 });

@@ -36,6 +36,7 @@ describe("SignUp target", () => {
       enabled: jest.fn(),
       postConfirmation: jest.fn(),
       userMigration: jest.fn(),
+      postAuthentication: jest.fn(),
     };
 
     signUp = SignUp({
@@ -83,7 +84,7 @@ describe("SignUp target", () => {
       UserCreateDate: now.getTime(),
       UserLastModifiedDate: now.getTime(),
       UserStatus: "UNCONFIRMED",
-      Username: expect.stringMatching(UUID),
+      Username: "0000-0000",
     });
   });
 
@@ -106,7 +107,7 @@ describe("SignUp target", () => {
         UserCreateDate: now.getTime(),
         UserLastModifiedDate: now.getTime(),
         UserStatus: "UNCONFIRMED",
-        Username: expect.stringMatching(UUID),
+        Username: "0000-0000",
       },
       {
         AttributeName: "email",
@@ -135,7 +136,7 @@ describe("SignUp target", () => {
       UserCreateDate: now.getTime(),
       UserLastModifiedDate: now.getTime(),
       UserStatus: "UNCONFIRMED",
-      Username: expect.stringMatching(UUID),
+      Username: "0000-0000",
     });
   });
 });

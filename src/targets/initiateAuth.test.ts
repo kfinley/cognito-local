@@ -1,10 +1,6 @@
 import { advanceTo } from "jest-date-mock";
 import jwt from "jsonwebtoken";
-import {
-  InvalidUsernameOrPasswordError,
-  NotAuthorizedError,
-  PasswordResetRequiredError,
-} from "../errors";
+import { InvalidUsernameOrPasswordError, NotAuthorizedError } from "../errors";
 import PublicKey from "../keys/cognitoLocal.public.json";
 import { CognitoClient, UserPoolClient } from "../services";
 import { Triggers } from "../services/triggers";
@@ -48,6 +44,7 @@ describe("InitiateAuth target", () => {
       enabled: jest.fn(),
       postConfirmation: jest.fn(),
       userMigration: jest.fn(),
+      postAuthentication: jest.fn(),
     };
 
     initiateAuth = InitiateAuth({
@@ -103,7 +100,7 @@ describe("InitiateAuth target", () => {
           },
           Session: "Session",
         })
-      ).rejects.toBeInstanceOf(PasswordResetRequiredError);
+      ).rejects.toBeInstanceOf(InvalidUsernameOrPasswordError);
     });
 
     describe("when user doesn't exist", () => {
@@ -152,7 +149,7 @@ describe("InitiateAuth target", () => {
               },
               Session: "Session",
             })
-          ).rejects.toBeInstanceOf(NotAuthorizedError);
+          ).rejects.toBeInstanceOf(InvalidUsernameOrPasswordError);
         });
       });
     });

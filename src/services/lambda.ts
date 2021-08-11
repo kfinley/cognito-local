@@ -20,6 +20,13 @@ interface UserMigrationEvent {
   triggerSource: "UserMigration_Authentication";
 }
 
+interface PostAuthenticationEvent {
+  userPoolId: string;
+  clientId: string;
+  username: string;
+  userAttributes: Record<string, string>;
+  triggerSource: "PostAuthentication_Authentication";
+}
 interface PostConfirmationEvent {
   userPoolId: string;
   clientId: string;
@@ -41,12 +48,17 @@ export interface Lambda {
     lambda: "PostConfirmation",
     event: PostConfirmationEvent
   ): Promise<CognitoUserPoolResponse>;
+  invoke(
+    lambda: "PostAuthentication",
+    event: PostAuthenticationEvent
+  ): Promise<CognitoUserPoolResponse>;
   enabled(lambda: "UserMigration"): boolean;
 }
 
 export interface FunctionConfig {
   UserMigration?: string;
   PostConfirmation?: string;
+  PostAuthentication?: string;
 }
 
 export type CreateLambda = (
@@ -58,7 +70,7 @@ export const createLambda: CreateLambda = (config, lambdaClient) => ({
   enabled: (lambda) => !!config[lambda],
   async invoke(
     trigger: keyof FunctionConfig,
-    event: UserMigrationEvent | PostConfirmationEvent
+    event: UserMigrationEvent | PostConfirmationEvent | PostAuthenticationEvent
   ) {
     const functionName = config[trigger];
     if (!functionName) {

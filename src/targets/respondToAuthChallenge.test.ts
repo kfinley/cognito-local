@@ -1,6 +1,6 @@
 import { advanceTo } from "jest-date-mock";
 import jwt from "jsonwebtoken";
-import { CodeMismatchError, NotAuthorizedError } from "../errors";
+import { CodeMismatchError, InvalidUsernameOrPasswordError } from "../errors";
 import PublicKey from "../keys/cognitoLocal.public.json";
 import { CognitoClient, UserPoolClient } from "../services";
 import { Triggers } from "../services/triggers";
@@ -41,6 +41,7 @@ describe("RespondToAuthChallenge target", () => {
       enabled: jest.fn(),
       postConfirmation: jest.fn(),
       userMigration: jest.fn(),
+      postAuthentication: jest.fn(),
     };
 
     respondToAuthChallenge = RespondToAuthChallenge({
@@ -63,7 +64,7 @@ describe("RespondToAuthChallenge target", () => {
         },
         Session: "Session",
       })
-    ).rejects.toBeInstanceOf(NotAuthorizedError);
+    ).rejects.toBeInstanceOf(InvalidUsernameOrPasswordError);
   });
 
   describe("when code matches", () => {

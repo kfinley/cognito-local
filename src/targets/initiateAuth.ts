@@ -175,5 +175,17 @@ export const InitiateAuth = ({
     return verifyMfaChallenge(user, body, userPool, codeDelivery);
   }
 
-  return await verifyPasswordChallenge(user, body, userPool);
+  const result = await verifyPasswordChallenge(user, body, userPool);
+
+  if (triggers.enabled("PostAuthentication")) {
+    await triggers.postAuthentication({
+      source: "PostAuthentication_Authentication",
+      username: user.Username,
+      clientId: body.ClientId,
+      userPoolId: userPool.config.Id,
+      userAttributes: user.Attributes,
+    });
+  }
+
+  return result;
 };
